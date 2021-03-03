@@ -1,3 +1,40 @@
+// Внешняя функция для вызова добавления в корзину
+function addBasket(id) {
+  cart.addToBasket(id);
+};
+// Внешняя функция для вызова удаления из корзины
+function deleteItem(id) {
+  cart.deleteFromBasket(id);
+};
+
+const API = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+// Перевести на Promise НЕ ИСПОЛЬЗОВАТЬ fetch
+// let getRequest = (url, callBack) => {
+  // let xhr = new XMLHttpRequest();
+  // xhr.open('GET', url, true);
+  // xhr.onreadystatechange = () => {
+  //   if (xhr.readyState === 4) {
+  //     if (xhr.status !== 200) {
+  //       console.log('Error');
+  //     } else {
+  //       callBack(xhr.responseText);
+  //     }
+  //   }
+  // }
+  // xhr.send();
+  function getRequest(url, callBack) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.onload = () => resolve(callBack(xhr.responseText));
+      xhr.onerror = () => reject(xhr.statusText);
+      xhr.send();
+    });
+  }
+
+
+///////////////////////////////////////
+
 class ProductList {
   #goods;
   #allProducts;
@@ -5,44 +42,38 @@ class ProductList {
   constructor(container = '.products') {
     console.log('constructor');
     this.container = container;
-    // this._goods = [];
     this.#goods = [];
     this.#allProducts = [];
 
     this.#fetchGoods();
     this.#render();
-    // this.sum = 0; // BAD!
-    this.goodsTotalPrice();
+  //   this.#getProducts()
+  //       .then((data) => {
+  //         this.#goods = [...data];
+  //         this.#render();
+  //       });
   }
 
-  // goodsTotalPrice() { // Very BAD!
-  //   let totalPrice = 0;
-  //   this.#goods.forEach(function (good) {
-  //
-  //       totalPrice += good.price;
-  //       console.log(good.price);
-  //
-  //   });
-  //
-  // }
-  //
-  //   document.querySelector('.blockTotal').insertAdjacentHTML('beforeend', `Сумма = ${this.sum}`);
-  // return НО НЕ this.sum!!!
-
-
-  // getTotalWithDiscount(discont) {
-  //   return this.goodsTotalPrice() * discont;
-  //
-
+  goodsTotalPrice() {
+    return this.#goods.reduce((sum, { price }) => sum + price, 0);
+  }
 
   #fetchGoods() {
-    this.#goods = [
-      {id: 1, title: 'Notebook', price: 20000},
-      {id: 2, title: 'Mouse', price: 1500},
-      {id: 3, title: 'Keyboard', price: 5000},
-      {id: 4, title: 'Gamepad', price: 4500},
-    ];
+    getRequest(`${API}/catalogData.json`, (data) => {
+      console.log(data);
+      this.#goods = JSON.parse(data);
+      this.#render();
+      console.log(this.#goods);
+      console.log(this.#allProducts);
+    });
   }
+  // #getProducts() {
+  //   return fetch(`${API}/catalogData.json`)
+  //       .then((response) => response.json())
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // }
 
   #render() {
     const block = document.querySelector(this.container);
@@ -52,35 +83,7 @@ class ProductList {
       console.log(productObject);
       this.#allProducts.push(productObject);
       block.insertAdjacentHTML('beforeend', productObject.render());
-
     });
-  }
-
-
-  goodsTotalPrice() {
-    let totalPrice = 0;
-    this.#goods.forEach(function (product) {
-      totalPrice += product.price;
-      console.log(product.price);
-    });
-
-    const conunt = new GoodsTotalPrice(totalPrice);
-    document.querySelector('.blockTotal').insertAdjacentHTML('beforeend', `Итоговая стоимость ${conunt.area}`);
-  }
-
-}
-
-class GoodsTotalPrice {
-  constructor(totalPrice) {
-    this.totalPrice = totalPrice;
-  }
-
-  get area() {
-    return this.calcArea();
-  }
-  calcArea() {
-    return this.totalPrice;
-
   }
 }
 
@@ -90,10 +93,7 @@ class ProductItem {
     this.price = product.price;
     this.id = product.id;
     this.img = img;
-
   }
-
-
 
   render() {
     return `<div class="product-item" data-id="${this.id}">
@@ -105,56 +105,47 @@ class ProductItem {
               </div>
           </div>`;
   }
-
 }
 
+class Basket {
+  constructor() {
+    this.cartGoods = [];
+  }
 
+  // Добавление товара в корзину (привязываем на нажатие кнопки)
+  addToBasket(id) {
+    let toBasket;
+    list.goods.forEach(function (item) {
 
+        this.title = product.title;
+        this.price = product.price;
+        this.id = product.id;
+        this.img = img;
+
+    });
+    this.cartGoods.push(toBasket);
+    this.goodsTotalPrice();
+  }
+
+  // Удаление товара из корзины (привязываем на нажатие кнопки)
+  deleteFromBasket(id) {
+    let getIdElemen;
+    this.cartGoods.forEach(function (item, i) {
+      let thisId = item.id;
+      if (id == thisId) {
+        getIdElemen = i;
+      }
+
+    });
+    this.cartGoods.splice(getIdElemen, 1);
+    this.render();
+    this.goodsTotalPrice();
+  }
+}
 
 const productList = new ProductList();
-
-
-// Добавление товара в корзину (привязываем на нажатие кнопки)
-// addToBasket() {}
-//
-// // Удаление товара из корзины (привязываем на нажатие кнопки)
-// deleteFromBasket() {}
-//
-// // Метод, который определяет, добавлены ли в корзину какие-либо товары и при их наличии активирует кнопку "Оформить заказ"
-// isOrder() {}
-//
-// // Метод открывания корзины
-// openBasket() {}
+  const cartGoods = new Basket();
 
 
 
 
-
-
-
-
-
-// const goodsTotalPrice= new TotalPrice();
-
-
-// const products = [
-//   {id: 1, title: 'Notebook', price: 20000},
-//   {id: 2, title: 'Mouse', price: 1500},
-//   {id: 3, title: 'Keyboard', price: 5000},
-//   {id: 4, title: 'Gamepad', price: 4500},
-// ];
-//
-// const renderProduct = ({ title, price }, img='https://placehold.it/200x150') => `<div class="product-item" data-id="${this.id}">
-//               <img src="${img}" alt="Some img">
-//               <div class="desc">
-//                   <h3>${title}</h3>
-//                   <p>${price} \u20bd</p>
-//                   <button class="buy-btn">Купить</button>
-//               </div>
-//           </div>`;
-//
-// const renderProducts = list => {
-// document.querySelector('.products').insertAdjacentHTML('beforeend', list.map(item => renderProduct(item)).join(''));
-// };
-//
-// renderProducts(products);
