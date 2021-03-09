@@ -142,7 +142,7 @@ class Cart extends List {
         .then(data => {
           if(data.result === 1) {
             let productId = +element.dataset['id'];
-            let find = this.allProduct.find(product => product.id_product === productId);
+            let find = this.allProducts.find(product => product.id_product === productId);
             if(find) {
               find.quantity++;
               this._updateCart(find);
@@ -174,7 +174,7 @@ class Cart extends List {
         .then(data => {
           if(data.result === 1) {
             let productId = +element.dataset['id'];
-            let find = this.allProduct.find(product => product.id_product === productId);
+            let find = this.allProducts.find(product => product.id_product === productId);
             if(find.quantity > 1) { // если товара > 1, то уменьшаем количество на 1
               find.quantity--;
               this._updateCart(find);
@@ -190,15 +190,15 @@ class Cart extends List {
   }
 
   /**
-   * добавляем данные корзины
+   * обновляем данные корзины
    * @param product
    * @private
    */
 
-  _updataCart(product) {
+  _updateCart(product) {
     let block =document.querySelector(`.cart-item[data-id="${product.id_product}"]`);
     block.querySelector('.product-quantity').textContent = `Количество: ${product.quantity}`;
-    block.querySelector('product-price').textContent = `${product.quantity * product.price} Р`;
+    block.querySelector('.product-price').textContent = `${product.quantity * product.price} Р`;
 
   }
   _init() {
@@ -207,7 +207,7 @@ class Cart extends List {
     });
     document.querySelector(this.container).addEventListener('click', e => {
       if(e.target.classList.contains('del-btn')) {
-        this.removeProduct(e,target);
+        this.removeProduct(e.target);
       }
     })
   }
@@ -231,7 +231,7 @@ class CartItem extends Item {
          </div>
         </div>
         <div class="right-block">
-        <p class="product-price">${this.quantity * this.price} P </p>
+        <p class="product-price">${this.quantity * this.price} P</p>
         <button class="del-btn" data-id="${this.id_product}">x</button>
         </div>
         </div>`
@@ -239,7 +239,7 @@ class CartItem extends Item {
 }
 
 const ListContext = {
-  ProductsList: ProductItem,
+  ProductList: ProductItem,
   Cart: CartItem
 };
 
